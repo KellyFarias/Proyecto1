@@ -34,7 +34,7 @@ Municipios.map(dynamic obj)
   this._cabecera=obj['cabecera'];
   this._superficie=obj['superficie'];
   this._altitud=obj['altitud'];
-  this._elevacion=obj['elevación'];
+  this._elevacion=obj['elevacion'];
   this._riocanal=obj['riocanal'];
   this._cuerpoagua=obj['cuerpoagua'];
   this._maspoblado=obj['maspoblado'];
@@ -71,7 +71,7 @@ Municipios.map(dynamic obj)
     _cabecera=snapshot.value['cabecera'];
     _superficie=snapshot.value['superficie'];
     _altitud=snapshot.value['altitud'];
-    _elevacion=snapshot.value['elevación'];
+    _elevacion=snapshot.value['elevacion'];
     _riocanal=snapshot.value['riocanal'];
     _cuerpoagua=snapshot.value['cuerpoagua'];
     _maspoblado=snapshot.value['maspoblado'];

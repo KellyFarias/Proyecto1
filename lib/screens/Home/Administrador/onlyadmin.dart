@@ -1,8 +1,7 @@
-import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'dart:async';
 import 'package:municipios/modelos/municipio.dart';
 import 'package:municipios/screens/Home/Administrador/municipio_information.dart';
 import 'package:municipios/screens/Home/Administrador/municipio_screen.dart';
@@ -19,26 +18,24 @@ final riesgoReference = FirebaseDatabase.instance.reference().child('riesgos');
 
 class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
   List<Municipios> items;
-  List<Municipios> visibleitems;
+ 
   StreamSubscription<Event> _onMunicipiosAddSusc;
   StreamSubscription<Event> _onMunicipiosEditSusc;
   final key = GlobalKey<ScaffoldState>();
-  final TextEditingController _searchQueryController = TextEditingController();
-  String munselect="all";
-  bool seach=false;
+  TextEditingController editingController=TextEditingController();
+ 
   @override
   void initState() {
     
     items = new List();
+    
     _onMunicipiosAddSusc =
         municipioReference.onChildAdded.listen(_onMunicipioAdded);
     _onMunicipiosEditSusc =
         municipioReference.onChildChanged.listen(_onMunicipioEdit);
+        
         super.initState(); 
     
-    _searchQueryController.addListener(onChange);
-        
-      filter();
       }
     
       @override
@@ -50,50 +47,60 @@ class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
     
       @override
       Widget build(BuildContext context) {
-        return MaterialApp(
-          home: Scaffold(
-            appBar: AppBar(
-              title: Text('Municipios List'),
-              centerTitle: true,
-              backgroundColor: Colors.pinkAccent,          
+        return new Scaffold(
+      appBar: new AppBar(
+        title: new Text('MUNICIPIOS'),
+      ),
+      drawer: Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  DrawerHeader(
+                    child: Text('Drawer header'),
+                    decoration: BoxDecoration(
+                      color: Colors.pink,
+                    ),
+                    ),
+                    ListTile(
+                      title: Text('Busqueda por Municipio'),
+                      onTap:(){
+                         },
+                    ),
+                    ListTile(
+                      title: Text('Busqueda por Zona de Riesgo'),
+                      onTap:(){
+                      },
+                    ),
+                ],
+              ),
             ),
-            body: Center(
+      body: Container(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                onChanged: (value) {
+                  setState(() {});
+                },
+                controller: editingController,
+                decoration: InputDecoration(
+                    labelText: "Search",
+                    hintText: "Search",
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+              ),
+            ),
+            Expanded(
               child: ListView.builder(
+                  shrinkWrap: true,
                   itemCount: items.length,
-                  padding: EdgeInsets.only(top: 3.0),
                   itemBuilder: (context, position) {
+                    if (editingController.text.isEmpty) {
                     return Column(
                       children: <Widget>[
-                        SizedBox(height: 110.0,),
-                        Padding(
-                          padding: EdgeInsets.only(left: 12.0,right: 12.0),
-                          child: Material(
-                            elevation: 5.0,
-                            borderRadius: BorderRadius.circular(30.0),
-                            child: TextField(
-                              onChanged: (changed){
-                                setState(() => munselect=changed);
-                              },
-                              controller: _searchQueryController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                prefixIcon: Icon(
-                                  Icons.search,
-                                  color: Colors.purple,
-                                  size: 25.0),
-                                  contentPadding: EdgeInsets.only(left: 10.0,top: 12.0),
-                                  hintText: 'Busca Municipio',
-                                  hintStyle: TextStyle(
-                                  color: Colors.blue,
-                                  fontFamily: 'Arial'
-    
-                                  )
-                              ),
-                            ),
-                          ),
-                          ),
-                        
-                        Divider(
+                         Divider(
                           height: 1.0,
                         ),                    
                         Container(
@@ -104,21 +111,21 @@ class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
                                 Expanded(
                                   child: ListTile(
                                       title: Text(
-                                        '${visibleitems[position].nombre}',
+                                        '${items[position].nombre}',
                                         style: TextStyle(
                                           color: Colors.blueAccent,
                                           fontSize: 21.0,
                                         ),
                                       ),
                                       subtitle: Text(
-                                        '${visibleitems[position].significado}',
+                                        '${items[position].significado}',
                                         style: TextStyle(
                                           color: Colors.blueGrey,
                                           fontSize: 21.0,
                                         ),
                                       ),
                                       onTap: () => _navigateToMunicipioInformation(
-                                          context, items[position])),
+                                          context, items[position]),),
                                 ),
                                 IconButton(
                                     icon: Icon(
@@ -143,9 +150,78 @@ class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
                         ),
                       ],
                     );
-                  }),
+                    } else if (items[position]
+                            .nombre
+                            .toLowerCase()
+                            .contains(editingController.text.toLowerCase())) {
+                       return Column(
+                      children: <Widget>[
+                         Divider(
+                          height: 1.0,
+                        ),                    
+                        Container(
+                          padding: new EdgeInsets.all(3.0),
+                          child: Card(                      
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: ListTile(
+                                      title: Text(
+                                        '${items[position].nombre}',
+                                        style: TextStyle(
+                                          color: Colors.blueAccent,
+                                          fontSize: 21.0,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        '${items[position].significado}',
+                                        style: TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontSize: 21.0,
+                                        ),
+                                      ),
+                                      onTap: () => _navigateToMunicipioInformation(
+                                          context, items[position]),),
+                                ),
+                                IconButton(
+                                    icon: Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () => _showDialog(context, position),
+                                    ),
+                                    
+                                //onPressed: () => _deleteProduct(context, items[position],position)),
+                                IconButton(
+                                    icon: Icon(
+                                      Icons.remove_red_eye,
+                                      color: Colors.blueAccent,
+                                    ),
+                                    onPressed: () =>
+                                        _navigateToMunicipio(context, items[position])),
+                              ],
+                            ),
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    );
+                    } else {
+                      return Container();
+                    }
+                    
+                  }
+                  ),
+                  
             ),
-            floatingActionButton: FloatingActionButton(
+            
+            
+          ],
+
+        ),
+        
+      ),
+       floatingActionButton: FloatingActionButton(
               child: Icon(
                 Icons.add,
                 color: Colors.white,
@@ -153,34 +229,15 @@ class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
               backgroundColor: Colors.pinkAccent,
               onPressed: () => _createNewMunicipio(context),
             ),
-          ),
-        );
+          );
+       
       }
     
-      void filter()
-      {
-        //setState
-        List<Municipios> tmp;
-        visibleitems.clear();
-        String name=_searchQueryController.text;
-        print(name + "Municipio slected");
-        if(name.isEmpty)
-        {
-          tmp.addAll(items);
+       //nuevo para que pregunte antes de eliminar un registro
 
-        }
-        else{
-          for(Municipios m in items)
-          {
-            if(m.nombre.toLowerCase().contains(name.toLowerCase()))
-            {
-              tmp.add(m);
-            }
-          }
-        }
-        visibleitems=tmp;
-      
-      }   //nuevo para que pregunte antes de eliminar un registro
+
+     
+       
       void _showDialog(context, position) {
         showDialog(
           context: context,
@@ -214,10 +271,12 @@ class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
           items.add(new Municipios.fromSnapShot(event.snapshot));
         });
       }
-      void _onSearchByMunicipio(Event event,String municip) {
+
+      void _onSearchByMunicipio(String municip) {
         setState(() {
           municipioReference.child('nombre').equalTo(municip).once().then((DataSnapshot snapshot)
           {
+            items.clear();
             items.add(new Municipios.fromSnapShot(snapshot));
           });
          
@@ -225,9 +284,15 @@ class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
       }
       void _onSearchByZonaRiesgo(Event event,String clave) {
         setState(() {
-          riesgoReference.child('clave').equalTo(clave).once().then((DataSnapshot snapshot)
+          riesgoReference.child('clave').equalTo(clave).once().then((DataSnapshot snapshot1)
           {
-            items.add(new Municipios.fromSnapShot(snapshot));
+            municipioReference.child(snapshot1.value.clave).equalTo(clave).once().then((DataSnapshot snapshot2)
+          {
+            items.clear();
+            items.add(new Municipios.fromSnapShot(snapshot2));
+          });
+
+           
           });
          
         });
@@ -277,12 +342,4 @@ class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
                   MunicipioScreen(Municipios(null,'', '','', '', '', '', '', '','' , '', '', '', '', '', ''))),
         );
       }
-    
-      
-    
-      void onChange() {
-        setState(() {
-          
-        });
-  }
 }

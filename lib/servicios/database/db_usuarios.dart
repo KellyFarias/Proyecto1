@@ -26,14 +26,15 @@ Future userregister(String uid,String nom,String email,String rol) async
 Future<String> isAdmin(String uid) async
 {
   String rol;
+  print("DB");
   
   await ref.child(uid).child("rol").once().then((DataSnapshot snapshot) {
 
-
+print("finish db");
     
     if(snapshot.value!=null)
     {
-      //print('Data : ${snapshot.value}');
+      print('Data : ${snapshot.value}');
     if(snapshot.value=="Administrador")
     {
       print('Data Admin : ${snapshot.value}');
@@ -47,6 +48,7 @@ Future<String> isAdmin(String uid) async
     }
   }
   );
+  print(rol);
   return rol;
 
   
