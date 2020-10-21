@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:municipios/modelos/municipio.dart';
 import 'package:municipios/screens/Home/Administrador/municipio_information.dart';
 import 'package:municipios/screens/Home/Administrador/municipio_screen.dart';
+import 'package:municipios/screens/Home/googlemap.dart';
 
 import '../../../modelos/municipio.dart';
 
@@ -108,7 +111,16 @@ class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
                           child: Card(                      
                             child: Row(
                               children: <Widget>[
-                                Expanded(
+                                 IconButton(
+                                    icon: Icon(
+                                      Icons.location_on ,
+                                      color: Colors.blueAccent,
+                                    ),
+                                    onPressed: ()
+                                    {
+                                       
+                               }),
+                               Expanded(
                                   child: ListTile(
                                       title: Text(
                                         '${items[position].nombre}',
@@ -164,6 +176,13 @@ class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
                           child: Card(                      
                             child: Row(
                               children: <Widget>[
+                                IconButton(
+                                    icon: Icon(
+                                      Icons.location_on,
+                                      color: Colors.blueAccent,
+                                    ),
+                                    onPressed: () =>
+                                        _navigateToMunicipio(context, items[position])),
                                 Expanded(
                                   child: ListTile(
                                       title: Text(
@@ -190,8 +209,6 @@ class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
                                     ),
                                     onPressed: () => _showDialog(context, position),
                                     ),
-                                    
-                                //onPressed: () => _deleteProduct(context, items[position],position)),
                                 IconButton(
                                     icon: Icon(
                                       Icons.remove_red_eye,
@@ -199,6 +216,7 @@ class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
                                     ),
                                     onPressed: () =>
                                         _navigateToMunicipio(context, items[position])),
+                                 
                               ],
                             ),
                             color: Colors.white,
@@ -324,6 +342,13 @@ class _ListViewMunicipiosAdminState extends State<ListViewMunicipiosAdmin> {
         await Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => MunicipioScreen(municipios)),
+        );
+      }
+      void _navigateToMap(
+          BuildContext context, String lat,String long) async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MyGooglePage(muMunicipion: '{municipios}',)),
         );
       }
     
